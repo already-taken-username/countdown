@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="timestamp" content="1592308800000">
+        <style>
+            ::root{
+                --color: royalblue;
+            }
+            body{
+                margin: 0;
+                width: 100%;
+                height: 100vh;
+                display: grid;
+                justify-content: stretch;
+                align-content: stretch;
+                background-color: var(--color);
+            }
+            main{
+                background-color: var(--color);
+                display: grid;
+                grid-auto-flow: row;
+                justify-content: center;
+                align-items: center;
+                align-content: center;
+                height: 100vh;
+                width: 100%;
+                user-select: none;
+            }
+            .line, h1{
+                display: grid;
+                grid-auto-flow: column;
+                grid-auto-columns: max-content;
+                justify-content: center;
+                align-items: start;
+            }
+            h1{
+                font-weight: normal;
+                padding-bottom: 128px;
+                margin: 0;
+            }
+            .number{
+                background-color: #000;
+                border-radius: 8px;
+                padding: 8px;
+                margin: 8px;
+                display: grid;
+                grid-auto-flow: row;
+                grid-gap: 8px;
+                font-family: monospace;
+                grid-auto-columns: max-content;
+                align-items: start;
+            }
+            .number ol{
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: grid;
+                grid-auto-flow: column;
+                grid-gap: 8px;
+            }
+            .number li{
+                display: block;
+                font-size: 75px;
+                padding: 8px;
+                border-radius: 4px;
+                background-color: #fff;
+                position: relative;
+                color: #000;
+                text-align: center;
+            }
+            .number li::after{
+                content: '';
+                position: absolute;
+                top: 50%;
+                bottom: 50%;
+                left: 0;
+                right: 0;
+                background-color: #000;
+                width: 100%;
+                height: 3px;
+                display: block;
+            }
+            .number .text{
+                color: #fff;
+                font-size: 28px;
+                padding: 0;
+                margin: 0;
+                text-align: center;
+                text-transform: uppercase;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="text/babel">
+            const colors = [
+                '#00F0FF',
+                'royalblue',
+                '#803ca1'
+            ]
+            document.documentElement.style.setProperty('--color', colors[ Math.floor( Math.random() * colors.length ) ]);
+            const unix = parseInt( document.querySelector("meta[name=timestamp]").content )
+            const timestamp = new Date( unix )
+            document.title = `${timestamp.toLocaleTimeString()} ${timestamp.toLocaleDateString()} • ${timestamp}`
+            const Number = (props) => {
+                const { number, text, digits, alt } = props
+                const numbers = number.toString().split('')
+                while( numbers.length < ( digits ? digits : 2 ) ){
+                    numbers.unshift('0')
+                }
+                return(
+                    <div className='number' title={alt}>
+                        <ol>
+                            { numbers.map( ( digit, index ) => <li key={index}>{digit}</li> ) }
+                        </ol>
+                        { text ? <p className='text'>{text}</p> : null }
+                    </div>
+                )
+            }
+            class Index extends React.Component{
+                constructor(props){
+                    super(props);
+                    this.state = {
+                        date: new Date()
+                    };
+                }
+                componentDidMount(){
+                    this.timer = setInterval( () => {
+                        this.tick()
+                    }, 1 );
+                }
+                componentWillUnmount(){
+                    clearInterval( this.timer );
+                }
+                tick(){
+                    this.setState({
+                        date: new Date()
+                    });
+                }
+                render(){
+                    const { date } = this.state
+                    const time = Math.abs( date.getTime() - timestamp.getTime() )
+                    const days = Math.trunc( time / ( 1000 * 3600 * 24 ) )
+                    const hours = Math.trunc( ( time - ( days * 86400000 ) ) / ( 1000 * 3600 ) )
+                    const minutes = Math.trunc( ( time - ( hours * 3600000 ) - ( days * 86400000 ) ) / ( 1000 * 60 ) )
+                    const seconds = Math.trunc( ( time - ( minutes * 60000 ) - ( hours * 3600000 ) - ( days * 86400000 ) ) / 1000 )
+                    return(
+                        <main>
+                            <h1>
+                                <Number number={ unix } alt={`${timestamp.toLocaleDateString().replaceAll('.','-')}_${timestamp.toLocaleTimeString()}`} />
+                            </h1>
+                            <div className='line'>
+                                { date.getTime() < unix ? <Number number={'+'} digits='1' /> : null }
+                                <Number number={ days } text='days' digits='3' />
+                                <Number number={ hours } text='hours' />
+                                <Number number={ minutes } text='minutes' />
+                                <Number number={ seconds } text='seconds' />
+                            </div>
+                        </main>
+                    )
+                }
+            }
+            ReactDOM.render(<Index />, document.body )
+        </script>
+    </body>
+</html>
