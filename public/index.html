@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="timestamp" content="1592308800000">
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
             ::root{
                 --color: royalblue;
             }
@@ -19,6 +20,7 @@
                 justify-content: stretch;
                 align-content: stretch;
                 background-color: var(--color);
+                font-family: 'Roboto', sans-serif;
             }
             main{
                 background-color: var(--color);
@@ -30,6 +32,7 @@
                 height: 100vh;
                 width: 100%;
                 user-select: none;
+                grid-gap: 10vh;
             }
             .line, h1{
                 display: grid;
@@ -40,7 +43,6 @@
             }
             h1{
                 font-weight: normal;
-                padding-bottom: 128px;
                 margin: 0;
             }
             .number{
@@ -83,6 +85,9 @@
                 background-color: #000;
                 width: 100%;
                 height: 3px;
+                display: none;
+            }
+            .overline .number li::after{
                 display: block;
             }
             .number .text{
@@ -93,19 +98,323 @@
                 text-align: center;
                 text-transform: uppercase;
             }
+            .icon{
+                text-decoration: none;
+                font-weight: bold;
+                font-style: normal;
+                width: 32px;
+                transition: background-color .2s, filter .2s;
+            }
+            #settings{
+                position: fixed;
+                bottom: 0;
+                right: 0;
+                display: grid;
+                grid-auto-flow: row;
+                justify-items: right;
+                padding: 16px;
+                grid-gap: 16px;
+            }
+            #settings label input[type='button'], #settings label input[type='checkbox']{
+                display: none;
+            }
+            #settings .button{
+                font-size: 32px;
+                width: 50px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: transparent;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            #settings .button:hover, #settings .button.focus{
+                background-color: #131313;
+                color: #fff;
+            }
+            #settings .button:hover .icon, #settings .button.focus .icon{
+                filter: invert(80%);
+            }
+            #settings ul{
+                width: 320px;
+                display: grid;
+                padding: 8px 0;
+                border-radius: 8px;
+                grid-gap: 2px;
+                grid-auto-flow: row;
+                background-color: #131313;
+                color: #fff;
+                list-style: none;
+                margin: 66px 0 0 66px;
+                box-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+                position: relative;
+                grid-auto-rows: minmax( 50px, max-content );
+            }
+            #settings ul::after{
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                right: 15px;
+                width: 0;
+                height: 0;
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                border-top: 10px solid #131313;
+            }
+            #settings label{
+                display: grid;
+                grid-auto-rows: auto;
+                grid-auto-columns: auto;
+                grid-auto-flow: row;
+                cursor: pointer;
+            }
+            #settings li{
+                padding: 8px 16px;
+                display: grid;
+                grid-auto-flow: column;
+                align-items: center;
+            }
+            #settings label:hover > li{
+                background-color: #2E2E2E;
+            }
+            #settings li.listButton{
+                grid-template-columns: max-content auto;
+            }
+            #settings li.listButton div{
+                margin-right: 16px;
+            }
+            #settings li.listRadio{
+                grid-template-columns: auto max-content;
+                grid-template-rows: minmax( 30px, max-content ) minmax( 30px, max-content );;
+                grid-template-areas: 'name variable'
+                    'input input';
+            }
+            #settings li.listRadio span{
+                grid-area: name;
+            }
+            #settings li.listRadio div{
+                grid-area: variable;
+                text-align: right;
+            }
+            #settings li.listRadio input{
+                grid-area: input;
+            }
+            #settings .checkbox{
+                width: 44px;
+                height: 22px;
+                border-radius: 15px;
+                border: 2px solid #2e2e2e;
+                background-color: #2E2E2E;
+                position: relative;
+                transition: background-color .2s, border .2s;
+            }
+            #settings label:hover .checkbox{
+                background-color: #131313;
+                border-color: #131313;
+            }
+            #settings .checkbox::before{
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                background-color: #fff;
+                width: 22px;
+                border-radius: 50%;
+                transform: translateX(0px);
+                transition: transform .2s;
+            }
+            #settings label input[type='checkbox']:checked ~ .checkbox{
+                background-color: var(--color);
+                border-color: var(--color);
+            }
+            #settings label input[type='checkbox']:checked ~ .checkbox::before{
+                transform: translateX(22px)
+            }
+            #settings input[type='range']{
+                -webkit-appearance: none;
+                height: 10px;
+                border-radius: 5px;
+                /*transform: rotate(180deg);*/
+                background-color: #2E2E2E;
+                outline: none;
+                border: none;
+                grid-area: range;
+                overflow: hidden;
+                cursor: pointer;
+                direction: rtl
+            }
+            #settings label:hover input[type='range']{
+                background-color: #131313;
+            }
+            #settings input[type='range']::-webkit-slider-thumb{
+                box-shadow: 205px 0 0 200px var(--color);
+                appearance: none;
+                width: 10px;
+                height: 10px;
+                background: #fff;
+                border-radius: 50%;
+                outline: none;
+                border: none;
+                position: relative;
+            }
+            #settings span{
+                font-size: 18px;
+            }
+            #settings label input[type='color']{
+                -webkit-appearance: none;
+                width: 44px;
+                height: 22px;
+                border-radius: 15px;
+                border: 2px solid #2e2e2e;
+                outline: none;
+                overflow: hidden;
+                position: relative;
+                transition: border .2s;
+            }
+            #settings label input[type='color']:hover{
+                border: 2px solid #131313;
+            }
+            #settings label input[type="color"]::-webkit-color-swatch-wrapper {
+                padding: 0;
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                bottom: -2px;
+                right: -2px;
+                width: calc( 100% + 4px );
+                height: calc( 100% + 4px );
+                border: none;
+                outline: none;
+            }
+            .window{
+                display: grid;
+                justify-content: center;
+                align-items: center;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: rgba(0,0,0,0.5);
+            }
+            .window > div{
+                box-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+                background-color: #131313;
+                border-radius: 8px;
+                color: #fff;
+                display: grid;
+                grid-auto-flow: row;
+                padding: 32px;
+                grid-gap: 32px;
+                font-size: 16px;
+            }
+            .window input[type='number']{
+                line-height: 40px;
+                background-color: #fff;
+                border: none;
+                outline: none;
+                color: #000;
+                font-weight: bold;
+                border-radius: 8px;
+                margin: 2px 4px;
+                padding: 0 0 0 16px;
+                overflow: hidden;
+                text-align: center;
+                font-size: 20px;
+            }
+            .window header{
+                padding: 0;
+                margin: 0;
+                font-size: 28px;
+                text-align: left;
+            }
+            .window form{
+                display: grid;
+                grid-auto-flow: row;
+                align-items: center;
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                grid-gap: 16px;
+                background-color: #2E2E2E;
+                padding: 16px;
+                border-radius: 8px;
+            }
+            .window form label{
+                background-color: #000;
+                border-radius: 8px;
+                padding: 5px;
+                display: grid;
+                grid-auto-flow: row;
+                font-family: monospace;
+                grid-gap: 5px;
+            }
+            .window form label span{
+                text-align: center;
+                text-transform: uppercase;
+            }
+            .window footer{
+                display: grid;
+                grid-auto-flow: column;
+                grid-auto-columns: max-content;
+                justify-content: end;
+                grid-gap: 16px;
+            }
+            .window .button input[type='button']{
+                display: none;
+            }
+            .window .button div{
+                padding: 12px 22px;
+                background-color: #2E2E2E;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+            .window .button.highlighted div{
+                background-color: var(--color);
+            }
         </style>
     </head>
     <body>
         <script type="text/babel">
+            const Params = () => {
+                const href = window.location.href
+                const url = new URL(href)
+                const timestamp = url.searchParams.get("timestamp")
+                const color = url.searchParams.get("color")
+                const heading = url.searchParams.get("heading")
+                const overline = url.searchParams.get("overline")
+                const symbol = url.searchParams.get("symbol")
+                const round = url.searchParams.get("round")
+                if( timestamp ){
+                    document.querySelector('meta[name="timestamp"]').setAttribute("content", timestamp)
+                }
+                if( color ){
+                    document.documentElement.style.setProperty('--color', `#${color}`)
+                }
+                if( heading ){
+                    localStorage['heading'] = heading == 'true' ? true : false
+                }
+                if( overline ){
+                    localStorage['overline'] = overline == 'true' ? true : false
+                }
+                if( symbol ){
+                    localStorage['symbol'] = symbol == 'true' ? true : false
+                }
+                if( round ){
+                    localStorage['round'] = round
+                }
+            }
             const colors = [
                 '#00F0FF',
-                'royalblue',
+                '#4169e1',
                 '#803ca1'
             ]
             document.documentElement.style.setProperty('--color', colors[ Math.floor( Math.random() * colors.length ) ]);
+            Params()
             const unix = parseInt( document.querySelector("meta[name=timestamp]").content )
             const timestamp = new Date( unix )
-            document.title = `${timestamp.toLocaleTimeString()} ${timestamp.toLocaleDateString()} • ${timestamp}`
+            document.title = `${timestamp.toLocaleTimeString()} ${timestamp.toLocaleDateString()} • ${timestamp.getTime()}`
             const Number = (props) => {
                 const { number, text, digits, alt } = props
                 const numbers = number.toString().split('')
@@ -121,48 +430,250 @@
                     </div>
                 )
             }
+            const SettingsElement = (props) => {
+                const { type, value, action, text, radio } = props
+                if( type == 'button' ){
+                    return(
+                        <label>
+                            <li className='listButton'>
+                                <input type='button' defaultValue={value} onClick={(e)=>action(e.target.value)} />
+                                <span>{text}</span>
+                            </li>
+                        </label>
+                    )
+                }else if( type == 'checkbox' ){
+                    return(
+                        <label>
+                            <li className='listButton'>
+                                <input type='checkbox' defaultChecked={value} onChange={(e)=>action(e.target.checked)} />
+                                <div className='checkbox'></div>
+                                <span>{text}</span>
+                            </li>
+                        </label>
+                    )
+                }else if( type == 'radio' ){
+                    return(
+                        <label>
+                            <li className='listRadio'>
+                                <span>Rounding to:</span>
+                                <div>{text}</div>
+                                <input type='range' onChange={action} defaultValue={value} min='0' max={radio} />
+                            </li>
+                        </label>
+                    )
+                }else if( type == 'color' ){
+                    return(
+                        <label>
+                            <li className='listButton'>
+                                <div>
+                                    <input type='color' defaultValue={value} onChange={(e)=>action(e.target.value)} />
+                                </div>
+                                <span>{text}</span>
+                            </li>
+                        </label>
+                    )
+                }
+            }
+            const Settings = (props) => {
+                const { preferences, action, range, round, symbol, overline, heading } = props
+                const changeAction = (e) => {
+                    const range = {
+                        min: 1,
+                        max: 4
+                    }
+                    const value = e.target.value
+                    if( value >= range.min && value <= range.max ){
+                        action('round', value, true )
+                    }else{
+                        if( value <= range.min ){
+                            e.target.value = range.min
+                        }else if( value >= range.max ){
+                            e.target.value = range.max
+                        }
+                    }
+                }
+                return(
+                    <div id='settings' onMouseLeave={()=>action('preferences', false)}>
+                        <ul style={ preferences ? null : {"display": "none"} }>
+                            <SettingsElement type='button' value={true} text={'Modify timestamp'} action={(value)=>action('window', value)} />
+                            <SettingsElement type='color' value={ document.documentElement.style.getPropertyValue('--color') } text={'Change color'} action={(value)=>document.documentElement.style.setProperty('--color', value)} />
+                            <SettingsElement type='checkbox' value={heading} text={'Show timestamp heading'} action={value=>action('heading', value, true)} />
+                            <SettingsElement type='checkbox' value={overline} text={'Digits overline'} action={value=>action('overline', value, true)} />
+                            <SettingsElement type='checkbox' value={symbol} text={'Symbol of difference'} action={value=>action('symbol', value, true)} />
+                            <SettingsElement type='radio' value={round} text={range[round]} action={changeAction} radio={range.length - 1} />
+                        </ul>
+                        <label className={`button ${ preferences ? 'focus' : null }`}>
+                            <input type='button' value={!preferences} onClick={(e)=>action('preferences', !preferences)} />
+                            <img className='icon' src="https://img.icons8.com/material-rounded/96/000000/sorting-options.png"/>
+                        </label>
+                    </div>
+                )
+            }
             class Index extends React.Component{
                 constructor(props){
                     super(props);
+                    const { checkStorage } = this
                     this.state = {
-                        date: new Date()
+                        date: new Date(),
+                        preferences: false,
+                        window: false,
+                        heading: checkStorage('heading', true),
+                        overline: checkStorage('overline', true),
+                        symbol: checkStorage('symbol', false),
+                        round: checkStorage('round', 3)
                     };
                 }
                 componentDidMount(){
                     this.timer = setInterval( () => {
-                        this.tick()
+                        this.stateUpdate('date', new Date() )
                     }, 1 );
                 }
                 componentWillUnmount(){
                     clearInterval( this.timer );
                 }
-                tick(){
+                stateUpdate(target, value, storage){
+                    if( storage ){
+                        localStorage[target] = value
+                    }
                     this.setState({
-                        date: new Date()
-                    });
+                        [target]: value
+                    })
+                }
+                checkStorage(name, value){
+                    const storage = localStorage[name]
+                    return storage ? ( storage == 'true' || storage == 'false' ? ( storage == 'true' ? true : false ) : storage ) : value
                 }
                 render(){
-                    const { date } = this.state
+                    const { preferences, date, round, symbol, overline, window, heading } = this.state
                     const time = Math.abs( date.getTime() - timestamp.getTime() )
                     const days = Math.trunc( time / ( 1000 * 3600 * 24 ) )
                     const hours = Math.trunc( ( time - ( days * 86400000 ) ) / ( 1000 * 3600 ) )
                     const minutes = Math.trunc( ( time - ( hours * 3600000 ) - ( days * 86400000 ) ) / ( 1000 * 60 ) )
                     const seconds = Math.trunc( ( time - ( minutes * 60000 ) - ( hours * 3600000 ) - ( days * 86400000 ) ) / 1000 )
+                    const range = [ 'miliseconds','seconds','minutes','hours','days','weeks' ]
                     return(
-                        <main>
-                            <h1>
-                                <Number number={ unix } alt={`${timestamp.toLocaleDateString().replaceAll('.','-')}_${timestamp.toLocaleTimeString()}`} />
-                            </h1>
-                            <div className='line'>
-                                { date.getTime() < unix ? <Number number={'+'} digits='1' /> : null }
-                                <Number number={ days } text='days' digits='3' />
-                                <Number number={ hours } text='hours' />
-                                <Number number={ minutes } text='minutes' />
-                                <Number number={ seconds } text='seconds' />
-                            </div>
-                        </main>
+                        <React.Fragment>
+                            <main className={ overline ? 'overline' : null }>
+                                <h1 style={ heading ? null : { display: 'none' } }>
+                                    <Number number={ isNaN(unix) ? 'NaM' : unix } alt={`${timestamp.toLocaleDateString().replaceAll('.','-')}_${timestamp.toLocaleTimeString()}`} />
+                                </h1>
+                                <div className='line'>
+                                    { symbol ?
+                                        date.getTime() < unix ? 
+                                            <Number number={'+'} digits='1' /> 
+                                            : 
+                                            <Number number={'-'} digits='1' /> 
+                                        : null
+                                    }
+                                    {
+                                        !isNaN(unix) ?
+                                            round >= 4 ?
+                                                <React.Fragment>
+                                                    <Number number={ days } text='days' digits='3' />
+                                                    <Number number={ hours } text='hours' />
+                                                    <Number number={ minutes } text='minutes' />
+                                                    <Number number={ seconds } text='seconds' />
+                                                </React.Fragment>
+                                            :
+                                                round == 3 ?
+                                                    <React.Fragment>
+                                                        <Number number={ hours + ( days * 24 ) } text='hours' digits='3' />
+                                                        <Number number={ minutes } text='minutes' />
+                                                        <Number number={ seconds } text='seconds' />
+                                                    </React.Fragment>
+                                                :
+                                                    round == 2 ?
+                                                        <React.Fragment>
+                                                            <Number number={ minutes + ( ( hours + ( days * 24 ) ) * 60 ) } text='minutes' digits='3' />
+                                                            <Number number={ seconds } text='seconds' />
+                                                        </React.Fragment>
+                                                    :
+                                                        round == 1 ?
+                                                            <React.Fragment>
+                                                                <Number number={ seconds + ( ( minutes + ( ( hours + ( days * 24 ) ) * 60 ) ) * 60 ) } text='seconds' digits='4' />
+                                                            </React.Fragment>
+                                                        :
+                                                            round <= 0 ?
+                                                                <Number number={ time } text='miliseconds' digits='8' />
+                                                            :
+                                                                null
+                                        :
+                                            null
+                                    }
+                                </div>
+                                <Settings 
+                                    preferences={preferences}
+                                    range={range} 
+                                    round={round} 
+                                    symbol={symbol} 
+                                    overline={overline}
+                                    heading={heading}
+                                    action={(t,v,s)=>this.stateUpdate(t,v,s)}
+                                    />
+                            </main>
+                            { window ? <Window window={window} action={(t,v,s)=>this.stateUpdate(t,v,s)} /> : null }
+                        </React.Fragment>
                     )
                 }
+            }
+            const WindowButton = (props) => {
+                const { text, highlighted, action } = props
+                return(
+                    <label className={`button ${ highlighted ? 'highlighted' : null }`}>
+                        <input type='button' onClick={()=>action()} />
+                        <div>
+                            {text}
+                        </div>
+                    </label>
+                )
+            }
+            const WindowTimeStamp = (props) => {
+                const { min, max, name, text, value } = props
+                return(
+                    <label>
+                        <input type='number' min={min} max={max} name={name} defaultValue={value} />
+                        <span>
+                            {text}
+                        </span>
+                    </label>
+                )
+            }
+            const Window = (props) => {
+                const { window, action } = props
+                const Save = () => {
+                    const form = document.forms['timestamp']
+                    const day = form['day'].value
+                    const month = form['month'].value - 1
+                    const year = form['year'].value
+                    const hours = form['hours'].value
+                    const minutes = form['minutes'].value
+                    const seconds = form['seconds'].value
+                    const date = new Date( year, month, day, hours, minutes, seconds )
+                    const href = location.href
+                    const url = new URL(href)
+                    url.searchParams.set("timestamp", date.getTime())
+                    location.href = url
+                }
+                const date = new Date()
+                return(
+                    <div className='window'>
+                        <div>
+                            <header>Modify timestamp</header>
+                            <form name='timestamp'>
+                                <WindowTimeStamp text='day' min='1' max='32' name='day' value={date.getDate()} />
+                                <WindowTimeStamp text='month' min='1' max='12' name='month' value={date.getMonth() + 1} />
+                                <WindowTimeStamp text='year' min='1970' max='2038' name='year' value={date.getFullYear()} />
+                                <WindowTimeStamp text='hours' min='0' max='23' name='hours' value={date.getHours()} />
+                                <WindowTimeStamp text='minutes' min='0' max='59' name='minutes' value={date.getMinutes()} />
+                                <WindowTimeStamp text='seconds' min='0' max='59' name='seconds' value={date.getSeconds()} />
+                            </form>
+                            <footer>
+                                <WindowButton text='Discard' action={()=>action('window', false)} />
+                                <WindowButton text='Apply' highlighted='true' action={()=>Save()} />
+                            </footer>
+                        </div>
+                    </div>
+                )
             }
             ReactDOM.render(<Index />, document.body )
         </script>
